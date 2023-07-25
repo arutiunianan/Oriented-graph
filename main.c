@@ -1,233 +1,334 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 
-struct Node{
+struct Nodes{
     
-    int node_number;
-    
-};
-
-struct Edge {
-    
-    int node_number_in;
-    int node_number_out;
+    int number_of_nodes;
+    int* nodes_number; 
     
 };
 
-struct Node* add_node(int node_number, int number_of_nodes, struct Node* node){
+struct Edges {
+    
+    int number_of_edges;
+    int* edges_nodes_number;
+    
+};
 
-    for(int i=0;i<number_of_nodes;i++){
 
-        if(node[i].node_number == node_number)
-        {
-            printf("%d ",-1);
-            return node;
+
+int* add_edge(int edge1, int edge2, struct Nodes nodes,struct Edges edges){
+    
+    int flag=0;
+    
+    for(int i=0;i<nodes.number_of_nodes;i++){
+        
+        if (edge1 == nodes.nodes_number[i]){
+            
+            flag = flag + 1;
+            
+        }
+        
+        if (edge2 == nodes.nodes_number[i]){
+            
+            flag = flag + 2;
+            
         }
         
     }
-    struct Node* r = calloc(number_of_nodes +1,sizeof(struct Node));
-    for(int j=0;j<number_of_nodes;j++){
-            
-        r[j].node_number = node[j].node_number;
+    
+    if (flag == 0){
+        
+        printf("%d, %d",-edge1,-edge2);
+        return edges.edges_nodes_number;
         
     }
-    r[number_of_nodes].node_number = node_number;
-    free(node);
+    
+    if (flag == 2 || (flag=0 && edge1 == edge2)){
+        
+        printf("%d ",-edge1);
+        return edges.edges_nodes_number;
+        
+    }
+    
+    if (flag == 1){
+        
+        printf("%d ",-edge2);
+        return edges.edges_nodes_number;
+        
+    }
+    
+    for(int i=0; i<edges.number_of_edges;i=i+2){
+        
+        if(edges.edges_nodes_number[i] == edge1 && edges.edges_nodes_number[i+1] == edge2)
+        {
+            printf("%d ",0);
+            return edges.edges_nodes_number;
+        }
+        
+    }
+    
+    int* r = calloc(edges.number_of_edges+2,sizeof(int));
+    
+    for(int j=0;j<edges.number_of_edges;j++){
+            
+        r[j] = edges.edges_nodes_number[j];
+        
+    }
+    
+    r[edges.number_of_edges] = edge1;
+    r[edges.number_of_edges+1] = edge2;
+    free(edges.edges_nodes_number);
+    return r;
+    
+    
+}
+
+
+int* remove_edge(int edge1, int edge2, struct Nodes nodes,struct Edges edges){
+    
+    int flag=0;
+    
+    for(int i=0;i<nodes.number_of_nodes;i++){
+        
+        if (edge1 == nodes.nodes_number[i]){
+            
+            flag = flag + 1;
+            
+        }
+        
+        if (edge2 == nodes.nodes_number[i]){
+            
+            flag = flag + 2;
+            
+        }
+        
+    }
+    
+    if (flag == 2){
+        
+        //printf("%d ",-edge1);
+        return edges.edges_nodes_number;
+        
+    }
+    
+    if (flag == 1){
+        
+        //printf("%d ",-edge2);
+        return edges.edges_nodes_number;
+        
+    }
+    
+    if (flag == 0){
+        
+        //printf("%d, %d",-edge1,-edge2);
+        return edges.edges_nodes_number;
+        
+    }
+    /*
+    
+    */
+    for(int i=0; i<edges.number_of_edges;i++){
+        
+        if(edges.edges_nodes_number[i] == edge1 && edges.edges_nodes_number[i+1] == edge2)
+        {
+            
+            int* r = calloc(edges.number_of_edges-2,sizeof(int));
+            
+            for(int j=0;j<i;j++){
+            
+               r[j] = edges.edges_nodes_number[j];
+        
+            }
+            for(int j=i;j<edges.number_of_edges;j++){
+                
+                r[j] = edges.edges_nodes_number[j+2];
+                
+            }
+            free(edges.edges_nodes_number);
+            return r;
+            
+        }
+        
+    }
+    
+    printf("%d ",0);
+    return edges.edges_nodes_number;
+    
+}
+
+int* add_node(int node_number, struct Nodes nodes){
+
+    for(int i=0;i<nodes.number_of_nodes;i++){
+
+        if(nodes.nodes_number[i] == node_number)
+        {
+            printf("%d ",-1);
+            return nodes.nodes_number;
+        }
+        
+    }
+    int* r = calloc(nodes.number_of_nodes+1,sizeof(int));
+    for(int j=0;j<nodes.number_of_nodes;j++){
+            
+        r[j] = nodes.nodes_number[j];
+        
+    }
+    r[nodes.number_of_nodes] = node_number;
+    free(nodes.nodes_number);
     return r;
 }
 
-struct Node* remove_node(int node_number, int number_of_nodes, struct Node* node,struct Edge* edge){
+int* remove_node(int node_number, struct Nodes nodes,struct Edges edges){
     
-    for(int i=0;i<number_of_nodes;i++){
+    for(int i=0;i<nodes.number_of_nodes;i++){
         
-        if(node[i].node_number == node_number)
+        if(nodes.nodes_number[i] == node_number)
         {
             
-            //for(int j=0;j<number_of_edges;j++){
+            for(int j=0;j<edges.number_of_edges;j++){
                 
-            //    if(edge[i].node_number_in == node_number){
+                if(edges.edges_nodes_number[j] == node_number){
                     
-            //    }
-            //}
+                    j=j-1;
+                    if(j%2==0){
+                        edges.edges_nodes_number =  remove_edge(edges.edges_nodes_number[j],edges.edges_nodes_number[j+1],nodes,edges);
+                    }
+                    else{
+                        edges.edges_nodes_number =  remove_edge(edges.edges_nodes_number[j-1],edges.edges_nodes_number[j],nodes,edges);
+                    }
+                    edges.number_of_edges = edges.number_of_edges - 2;
+                    printf("(%d); ",edges.number_of_edges);
+                    
+                }
+            }
             
-            struct Node* r = calloc(number_of_nodes-1,sizeof(struct Node));
+            int* r = calloc(nodes.number_of_nodes+1,sizeof(int));
             for(int j=0;j<i;j++){
                 
-                r[j].node_number = node[j].node_number;
+                r[j] = nodes.nodes_number[j];
             }
-            for(int j=i;j<number_of_nodes;j++){
+            for(int j=i;j<nodes.number_of_nodes;j++){
                 
-                r[j].node_number = node[j+1].node_number;
+               r[j] = nodes.nodes_number[j+1];
             }
             
             
-            free(node);
+            free(nodes.nodes_number);
             return r;
             
         }
     }
     printf("%d ",-1);
-    return node;
+    return nodes.nodes_number;
 }
 
-
-struct Edge* add_edge(int edge1, int edge2, int number_of_nodes, int number_of_edges, struct Node* node,struct Edge* edge){
-    
-    int flag=0;
-    
-    for(int i=0;i<number_of_nodes;i++){
-        
-        if (edge1 == node[i].node_number){
-            
-            flag = flag + 1;
-            
-        }
-        
-        if (edge2 == node[i].node_number){
-            
-            flag = flag + 2;
-            
-        }
-        
-    }
-    
-    if (flag == 2){
-        
-        printf("%d ",-edge1);
-        return edge;
-        
-    }
-    
-    if (flag == 1){
-        
-        printf("%d ",-edge2);
-        return edge;
-        
-    }
-    
-    if (flag == 0){
-        
-        printf("%d, %d",-edge1,-edge2);
-        return edge;
-        
-    }
-    
-    for(int i=0; i<number_of_edges;i++){
-        
-        if(edge[i].node_number_out == edge1 && edge[i].node_number_in == edge2)
-        {
-            printf("%d ",-0);
-            return edge;
-        }
-        
-    }
-    
-    struct Edge* r = calloc(number_of_nodes +1,sizeof(struct Edge));
-    for(int j=0;j<number_of_edges;j++){
-            
-        r[j].node_number_out = edge[j].node_number_out;
-        r[j].node_number_in = edge[j].node_number_in;
-        
-    }
-    
-    r[number_of_edges].node_number_out = edge1;
-    r[number_of_edges].node_number_in = edge2;
-    free(edge);
-    return r;
-    
-}
-
-
-struct Edge* remove_edge(int edge1, int edge2, int number_of_nodes, int number_of_edges, struct Node* node,struct Edge* edge){
-    
-    int flag=0;
-    
-    for(int i=0;i<number_of_nodes;i++){
-        
-        if (edge1 == node[i].node_number){
-            
-            flag = flag + 1;
-            
-        }
-        
-        if (edge2 == node[i].node_number){
-            
-            flag = flag + 2;
-            
-        }
-        
-    }
-    
-    if (flag == 2){
-        
-        printf("%d ",-edge1);
-        return edge;
-        
-    }
-    
-    if (flag == 1){
-        
-        printf("%d ",-edge2);
-        return edge;
-        
-    }
-    
-    if (flag == 0){
-        
-        printf("%d, %d",-edge1,-edge2);
-        return edge;
-        
-    }
-    
-    for(int i=0; i<number_of_edges;i++){
-        
-        if(edge[i].node_number_out == edge1 && edge[i].node_number_in == edge2)
-        {
-            
-            struct Edge* r = calloc(number_of_nodes-1,sizeof(struct Edge));
-            for(int j=0;j<i;j++){
-            
-                r[j].node_number_out = edge[j].node_number_out;
-                r[j].node_number_in = edge[j].node_number_in;
-        
-            }
-            for(int j=i;j<number_of_edges;j++){
-                
-                r[j].node_number_out = edge[j+1].node_number_out;
-                r[j].node_number_in = edge[j+1].node_number_in;
-                
-            }
-            free(edge);
-            return r;
-            
-        }
-        
-    }
-    
-    printf("%d ",-0);
-    return edge;
-    
-}
 
 int main(void)
 {
-
-    struct Edge* edge = (struct Edge*)malloc(sizeof(struct Edge)*0); 
-    struct Node* node = (struct Node*)malloc(sizeof(struct Node)*0); 
-    int number_of_nodes = 0;
-    int number_of_edges = 0;
+    
+    char command[11];
+    int node_number;
+    int edge1,edge2;
     int root = -1;
     
+    //struct Edge* edge = (struct Edge*)malloc(sizeof(struct Edge)*0); 
+    //struct Node* node = (struct Node*)malloc(sizeof(struct Node)*0);
+    struct Edges edges;
+    struct Nodes nodes;
+    nodes.number_of_nodes = 0;
+    edges.number_of_edges = 0;
     
+    nodes.nodes_number = (int*)malloc(sizeof(int)*0);
+    
+    edges.edges_nodes_number = (int*)malloc(sizeof(int)*0);
+    
+    
+    do{
+        scanf("%s",command);
+        switch
+        if(!strcmp(command,"ADD_NODE"))
+        {
+            int* node1 = nodes.nodes_number;
+
+            
+            scanf("%d", &node_number);
+            nodes.nodes_number = add_node(node_number, nodes);
+            if(nodes.nodes_number != node1)
+                nodes.number_of_nodes = nodes.number_of_nodes + 1;
+        }
+        else
+        {
+            if(!strcmp(command,"ADD_EDGE"))
+            {
+                
+                int* edge12 = edges.edges_nodes_number;
+                
+                scanf("%d %d", &edge1, &edge2);
+                edges.edges_nodes_number =  add_edge(edge1,edge2,nodes,edges);
+                if(edges.edges_nodes_number != edge12)
+                    edges.number_of_edges = edges.number_of_edges + 2;
+                
+            }
+            else
+            {
+                if(!strcmp(command,"REMOVE_NODE"))
+                {
+                    
+                    int* node1 = nodes.nodes_number;
+                    
+                    scanf("%d", &node_number);
+                    nodes.nodes_number = remove_node(node_number, nodes, edges);
+                    if(nodes.nodes_number != node1)
+                        nodes.number_of_nodes = nodes.number_of_nodes - 1;
+            
+                }
+                else
+                {
+                    if(!strcmp(command,"REMOVE_EDGE"))
+                    {
+                        int* edge12 = edges.edges_nodes_number;
+                        
+                        int edge1,edge2;
+                        scanf("%d %d", &edge1, &edge2);
+                        edges.edges_nodes_number =  remove_edge(edge1,edge2,nodes,edges);
+                        
+                        if(edges.edges_nodes_number != edge12){
+                            edges.number_of_edges = edges.number_of_edges - 2;
+                        }
+                    }
+                    else
+                    {
+                        if(!strcmp(command,"ROOT"))
+                        {
+                            
+                            scanf("%d",root);
+                            
+                        }
+                        else
+                        {
+                            if(!strcmp(command,"PRINT_PRO"))
+                            {
+                                    
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        }
+    }while(!strcmp(command,"END"))
+              
     for(int i=0; i<5;i=i+1){
 
-        struct Node* node1 = node;
+        int* node1 = nodes.nodes_number;
 
-        int node_number;
+        
         scanf("%d", &node_number);
-        node = add_node(node_number, number_of_nodes, node);
-        if(node != node1){
-            number_of_nodes = number_of_nodes + 1;
+        nodes.nodes_number = add_node(node_number, nodes);
+        if(nodes.nodes_number != node1){
+            nodes.number_of_nodes = nodes.number_of_nodes + 1;
         }
         
     }
@@ -236,67 +337,70 @@ int main(void)
     
     for(int i=0; i<5;i=i+1){
         
-        struct Edge* edge12 = edge;
+        int* edge12 = edges.edges_nodes_number;
         
-        int edge1,edge2;
+        
         scanf("%d %d", &edge1, &edge2);
-        edge =  add_edge(edge1,edge2,number_of_nodes,number_of_edges,node,edge);
-        if(edge != edge12){
-            number_of_edges = number_of_edges + 1;
+        edges.edges_nodes_number =  add_edge(edge1,edge2,nodes,edges);
+        if(edges.edges_nodes_number != edge12){
+            edges.number_of_edges = edges.number_of_edges + 2;
         }
 
     }
     
+    printf("%d ",1000000);
+    
     for(int i=0; i<5;i=i+1){
         
-        struct Node* node1 = node;
-        
-        printf(" %p ",node);
+        int* node1 = nodes.nodes_number;
         
         int node_number;
         scanf("%d", &node_number);
-        node = remove_node(node_number, number_of_nodes, node, edge);
-        if(node != node1){
-            number_of_nodes = number_of_nodes - 1;
-        
+        nodes.nodes_number = remove_node(node_number, nodes, edges);
+        if(nodes.nodes_number != node1){
+            nodes.number_of_nodes = nodes.number_of_nodes - 1;
         }
+        printf("(%d) ",edges.number_of_edges);
 
     }
 
+
+    for(int i=0; i<edges.number_of_edges; i=i+2){
+
+        printf("%d|%d ",edges.edges_nodes_number[i],edges.edges_nodes_number[i+1]);
+
+    }
     
-    for(int i=0; i<number_of_edges; i=i+1){
+    
+    for(int i=0; i<nodes.number_of_nodes; i=i+1){
 
-        printf("%d|%d ",edge[i].node_number_out,edge[i].node_number_in);
+        printf("%d, ",nodes.nodes_number[i]);
 
     }
     
-    for(int i=0; i<number_of_nodes; i=i+1){
-
-        printf("%d, ",node[i].node_number);
-
-    }
+    printf("%d ",1000000);
     
     
     for(int i=0; i<5;i=i+1){
         
-        struct Edge* edge12 = edge;
+        int* edge12 = edges.edges_nodes_number;
         
         int edge1,edge2;
         scanf("%d %d", &edge1, &edge2);
-        edge =  add_edge(edge1,edge2,number_of_nodes,number_of_edges,node,edge);
-        if(edge != edge12){
-            number_of_edges = number_of_edges + 1;
+        edges.edges_nodes_number =  remove_edge(edge1,edge2,nodes,edges);
+        
+        if(edges.edges_nodes_number != edge12){
+            edges.number_of_edges = edges.number_of_edges - 2;
         }
 
     }
     
     
-    for(int i=0; i<number_of_edges; i=i+1){
+    for(int i=0; i<edges.number_of_edges; i=i+2){
 
-        printf("%d|%d ",edge[i].node_number_out,edge[i].node_number_in);
+        printf("%d|%d ",edges.edges_nodes_number[i],edges.edges_nodes_number[i+1]);
 
     }
-    
     
     
 }
