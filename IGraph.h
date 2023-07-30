@@ -5,7 +5,7 @@ typedef struct Node
 {
 
     int id; // identifier
-    unsigned visited; 
+    unsigned visited; // 0 - WHITE, 1 - GREY , 2 - BLACK
     // here can be additional fields
 
 } Node;

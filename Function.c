@@ -184,18 +184,20 @@ extern void MakeRPO( Graph* graph, Node* current_node, int* pro_ides )
 
         if( graph->edges[i].start_id == current_node->id )
         {
-            /*
-            if( FindNodeById( graph, graph->edges[i].end_id )->visited )
+            
+            Node* next_node = FindNodeById( graph, graph->edges[i].end_id );
+
+            if( next_node->visited == 1 )
                 printf( "Found loop: %d -> %d\n", current_node->id, graph->edges[i].end_id );
             else
-            */
-            if( !FindNodeById( graph, graph->edges[i].end_id )->visited )
-                MakeRPO( graph, FindNodeById( graph, graph->edges[i].end_id ), pro_ides );
+                if( !next_node->visited )
+                     MakeRPO( graph, next_node, pro_ides );
 
         }
 
     }
 
+    current_node->visited = 2;
     pro_ides[pro_ides[0]++] = current_node->id;
 
 }
