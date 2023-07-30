@@ -43,7 +43,8 @@ extern Node* AddNode( Graph* graph, int node_id )
 
     //graph->nodes = ( Node* ) realloc ( graph->nodes, sizeof( struct Node ) * ( 1 + graph->current_nodes ) );
     
-    graph->nodes[graph->current_nodes++].id = node_id;
+    graph->nodes[graph->current_nodes].id = node_id;
+    graph->nodes[graph->current_nodes++].visited = 0;
     return graph->nodes;
 
 } 
@@ -155,8 +156,8 @@ extern void RemoveNode( Graph* graph, int node_id )
 
         }
 
-    node->id = graph->nodes[graph->current_nodes - 1].id;
     graph->current_nodes --;
+    node->id = graph->nodes[graph->current_nodes].id;
     return;
 
     }
@@ -164,7 +165,40 @@ extern void RemoveNode( Graph* graph, int node_id )
     printf("Node with num %d is not exist\n",node_id);
 }
 
-//extern void MakeRPO( Graph* graph );
+extern void MakeRoot( Graph* graph, int root )
+{
+
+    if( FindNodeById ( graph, root ) )
+        graph->root = root;
+    else
+        printf( "Node with num %d is not exist\n" , root );
+
+}
+
+extern void MakeRPO( Graph* graph, Node* current_node, int* pro_ides )
+{
+
+    current_node->visited = 1;
+    for( int i = 0; i < graph->current_edges; i++ )
+    {
+
+        if( graph->edges[i].start_id == current_node->id )
+        {
+            /*
+            if( FindNodeById( graph, graph->edges[i].end_id )->visited )
+                printf( "Found loop: %d -> %d\n", current_node->id, graph->edges[i].end_id );
+            else
+            */
+            if( !FindNodeById( graph, graph->edges[i].end_id )->visited )
+                MakeRPO( graph, FindNodeById( graph, graph->edges[i].end_id ), pro_ides );
+
+        }
+
+    }
+
+    pro_ides[pro_ides[0]++] = current_node->id;
+
+}
 
 extern Node* FindNodeById( Graph* graph, int node_id )
 {

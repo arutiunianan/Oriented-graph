@@ -5,7 +5,7 @@ typedef struct Node
 {
 
     int id; // identifier
-    //unsigned rpo_id; // id by RPO
+    unsigned visited; 
     // here can be additional fields
 
 } Node;
