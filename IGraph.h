@@ -1,12 +1,21 @@
 #ifndef IGRAPH_H_
 #define IGRAPH_H_
 
+#include <stdio.h>
+
+enum VisitType
+{
+    NOT_VISITED, 
+    STARTED_VISIT,
+    FINISHED_VISIT
+};
+
 typedef struct Node
 {
 
     int id; // identifier
-    unsigned visited; // 0 - WHITE, 1 - GREY , 2 - BLACK
-    // here can be additional fields
+    enum VisitType visited; // RPO visit status
+
 
 } Node;
 

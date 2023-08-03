@@ -1,5 +1,5 @@
 #include "Function.h"
-#include <stdio.h>
+
 #include <stdlib.h>
 #include <assert.h>
 
@@ -9,16 +9,19 @@
 Graph* NewGraph( )
 {
     struct Graph* graph = ( Graph* ) malloc ( sizeof ( struct Graph ) );
+    assert( NULL != graph );
 
     graph->root = -1;
 
     graph->current_nodes = 0;
     graph-> allocated_nodes = INITIAL_SIZE;
     graph->nodes = ( Node* ) malloc ( sizeof ( struct Node ) * INITIAL_SIZE );
+    assert( NULL != graph->nodes );
 
     graph->current_edges = 0;
     graph->allocated_edges = INITIAL_SIZE;
     graph->edges = ( Edge* ) malloc ( sizeof ( struct Edge )  * INITIAL_SIZE );
+    assert( NULL != graph->edges );
 
     return graph;
 
@@ -40,11 +43,10 @@ extern Node* AddNode( Graph* graph, int node_id )
         graph->nodes = ( Node* ) realloc( graph->nodes, sizeof(Node) * graph->allocated_nodes );
         assert( NULL != graph->edges );
     }
-
-    //graph->nodes = ( Node* ) realloc ( graph->nodes, sizeof( struct Node ) * ( 1 + graph->current_nodes ) );
     
     graph->nodes[graph->current_nodes].id = node_id;
-    graph->nodes[graph->current_nodes++].visited = 0;
+    graph->nodes[graph->current_nodes].visited = NOT_VISITED;
+    graph->current_nodes++;
     return graph->nodes;
 
 } 
@@ -85,10 +87,11 @@ extern Edge* AddEdge( Graph* graph, int start_id, int end_id )
     }
 
     graph->edges[graph->current_edges].end_id = end_id;
-    graph->edges[graph->current_edges++].start_id = start_id;
+    graph->edges[graph->current_edges].start_id = start_id;
+    graph->current_edges++;
     return graph->edges;
 
-} // returns pointer to new edge
+} 
 
 extern void RemoveEdge( Graph* graph, int start_id, int end_id )
 {
@@ -156,9 +159,9 @@ extern void RemoveNode( Graph* graph, int node_id )
 
         }
 
-    graph->current_nodes --;
-    node->id = graph->nodes[graph->current_nodes].id;
-    return;
+        graph->current_nodes --;
+        node->id = graph->nodes[graph->current_nodes].id;
+        return;
 
     }
 
@@ -178,7 +181,7 @@ extern void MakeRoot( Graph* graph, int root )
 extern void MakeRPO( Graph* graph, Node* current_node, int* pro_ides )
 {
 
-    current_node->visited = 1;
+    current_node->visited = STARTED_VISIT;
     for( int i = 0; i < graph->current_edges; i++ )
     {
 
@@ -187,18 +190,19 @@ extern void MakeRPO( Graph* graph, Node* current_node, int* pro_ides )
             
             Node* next_node = FindNodeById( graph, graph->edges[i].end_id );
 
-            if( next_node->visited == 1 )
+            if( next_node->visited == STARTED_VISIT )
                 printf( "Found loop: %d -> %d\n", current_node->id, graph->edges[i].end_id );
             else
-                if( !next_node->visited )
+                if( next_node->visited == NOT_VISITED ) 
                      MakeRPO( graph, next_node, pro_ides );
 
         }
 
     }
 
-    current_node->visited = 2;
-    pro_ides[pro_ides[0]++] = current_node->id;
+    current_node->visited = FINISHED_VISIT;
+    pro_ides[pro_ides[0]] = current_node->id;
+    pro_ides[0]++;
 
 }
 
@@ -215,29 +219,3 @@ extern Node* FindNodeById( Graph* graph, int node_id )
     }
     return NULL;
 }
-
-/*
-typedef struct Node
-{
-    int id; // identifier
-    //unsigned rpo_id; // id by RPO
-    // here can be additional fields
-} Node;
-
-typedef struct Edge
-{
-    int start_id;
-    int end_id;
-} Edge;
-
-typedef struct Graph
-{
-    unsigned current_nodes; // current size of array
-    Node *nodes;
-
-    unsigned current_edges; // current size of array
-    Edge *edges;
-} Graph;
-
-#endif // #define IGRAPH_H_
-*/
