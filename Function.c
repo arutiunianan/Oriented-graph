@@ -1,6 +1,7 @@
 #include "Function.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <assert.h>
 
 #define INITIAL_SIZE 10
@@ -70,7 +71,7 @@ extern Edge* AddEdge( Graph* graph, int start_id, int end_id )
 
     }
 
-    for ( int i = 0; i < graph->current_edges; i++ )
+    for ( unsigned int i = 0; i < graph->current_edges; i++ )
     {
         if ( graph->edges[i].start_id == start_id && graph->edges[i].end_id == end_id)
         {
@@ -112,7 +113,7 @@ extern void RemoveEdge( Graph* graph, int start_id, int end_id )
 
     }
 
-    for ( int i = 0; i < graph->current_edges; i++ )
+    for ( unsigned int i = 0; i < graph->current_edges; i++ )
     {
         if ( graph->edges[i].start_id == start_id && graph->edges[i].end_id == end_id)
         {
@@ -138,7 +139,7 @@ extern void RemoveNode( Graph* graph, int node_id )
     if( node )
     {
 
-        for ( int i = 0; i < graph->current_edges; i ++ )
+        for ( unsigned int i = 0; i < graph->current_edges; i ++ )
         {
 
             if( graph->edges[i].start_id == node_id )
@@ -182,7 +183,7 @@ extern void MakeRPO( Graph* graph, Node* current_node, int* pro_ides )
 {
 
     current_node->visited = STARTED_VISIT;
-    for( int i = 0; i < graph->current_edges; i++ )
+    for( unsigned int i = 0; i < graph->current_edges; i++ )
     {
 
         if( graph->edges[i].start_id == current_node->id )

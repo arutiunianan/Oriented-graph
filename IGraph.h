@@ -1,7 +1,6 @@
 #ifndef IGRAPH_H_
 #define IGRAPH_H_
 
-#include <stdio.h>
 
 enum VisitType
 {
